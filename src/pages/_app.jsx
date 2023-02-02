@@ -1,26 +1,33 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Header from '@/config'
 import Layout from '@/components/dom/Layout'
 import '@/styles/index.css'
+import * as THREE from 'three'
 
-const Scene = dynamic(() => import('@/components/canvas/Scene'), { ssr: true })
+const innerMaterial = new THREE.MeshStandardMaterial({
+  transparent: true,
+  opacity: 1,
+  color: 'black',
+  roughness: 0,
+  side: THREE.FrontSide,
+  blending: THREE.AdditiveBlending,
+  polygonOffset: true,
+  polygonOffsetFactor: 1,
+  envMapIntensity: 2,
+})
+
+// const Scene = dynamic(() => import('@/components/canvas/Scene'), { ssr: true })
 
 export default function App({ Component, pageProps = { title: 'index' } }) {
   const ref = useRef()
+  const [isAutoCamera, setIsAutoCamera] = useState(false)
   return (
     <>
       <Header title={pageProps.title} />
       <Layout ref={ref}>
-        <Component {...pageProps} />
-        {/* The canvas can either be in front of the dom or behind. If it is in front it can overlay contents.
-         * Setting the event source to a shared parent allows both the dom and the canvas to receive events.
-         * Since the event source is now shared, the canvas would block events, we prevent that with pointerEvents: none. */}
-        {Component?.canvas && (
-          <Scene className='pointer-events-none' eventSource={ref} eventPrefix='client'>
-            {Component.canvas(pageProps)}
-          </Scene>
-        )}
+        {Component?.canvas && Component.canvas({ ...pageProps, evenSource: ref, isAutoCamera })}
+        <Component isOn={isAutoCamera} onClick={() => setIsAutoCamera((prev) => !prev)} {...pageProps} />
       </Layout>
     </>
   )
