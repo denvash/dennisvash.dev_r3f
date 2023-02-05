@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import React, { Suspense, useEffect, useRef, useState } from 'react'
+import React, { Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useControls, button } from 'leva'
 import { Canvas } from '@react-three/fiber'
 import {
@@ -13,7 +13,6 @@ import {
   AccumulativeShadows,
   MeshTransmissionMaterial,
   OrbitControls,
-  Preload,
   CameraControls,
   useProgress,
 } from '@react-three/drei'
@@ -48,9 +47,11 @@ function Camera() {
 
   useEffect(() => {
     if (!isLoading) {
-      cameraControlsRef.current.smoothTime = smoothTime
-      cameraControlsRef.current.zoomTo(zoom, true)
-      cameraControlsRef.current.setPosition(...position, true)
+      setTimeout(() => {
+        cameraControlsRef.current.smoothTime = smoothTime
+        cameraControlsRef.current?.zoomTo(zoom, true)
+        cameraControlsRef.current?.setPosition(...position, true)
+      }, 2000)
     }
   }, [smoothTime, isLoading, position, zoom])
 
@@ -77,33 +78,29 @@ export default function App({ eventSource }) {
       eventSource={eventSource}
       eventPrefix='client'
       camera={{ position: [0, 100, 0], fov: 26 }}>
-      <Suspense>
-        <Preload all />
-        <Camera />
-        <Env isPerformanceSucks={isPerformanceSucks} />
-        <PerformanceMonitor onDecline={() => degradePerfromance(true)} />
-        <color attach='background' args={[]} />
-
+      <Camera />
+      <Env isPerformanceSucks={isPerformanceSucks} />
+      <PerformanceMonitor onDecline={() => degradePerfromance(true)} />
+      <color attach='background' args={['#f0f0f0']} />
+      <Suspense fallback={null}>
         <group position={scenePosition} rotation={rotation}>
-          <Suspense fallback={null}>
-            <Scene />
-            <AccumulativeShadows
-              frames={100}
-              alphaTest={0.85}
-              opacity={0.8}
-              color='red'
-              scale={20}
-              position={[0, -0.005, 0]}>
-              <RandomizedLight
-                amount={8}
-                radiuss={6}
-                ambient={0.5}
-                intensity={1}
-                position={[-1.5, 2.5, -2.5]}
-                bias={0.001}
-              />
-            </AccumulativeShadows>
-          </Suspense>
+          <Scene />
+          <AccumulativeShadows
+            frames={100}
+            alphaTest={0.85}
+            opacity={0.8}
+            color='red'
+            scale={20}
+            position={[0, -0.005, 0]}>
+            <RandomizedLight
+              amount={8}
+              radiuss={6}
+              ambient={0.5}
+              intensity={1}
+              position={[-1.5, 2.5, -2.5]}
+              bias={0.001}
+            />
+          </AccumulativeShadows>
         </group>
       </Suspense>
     </Canvas>
