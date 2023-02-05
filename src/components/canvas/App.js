@@ -1,8 +1,7 @@
 import * as THREE from 'three'
-import React, { useRef, useState } from 'react'
-import { easing } from 'maath'
-import { useControls } from 'leva'
-import { Canvas, useFrame } from '@react-three/fiber'
+import React, { Suspense, useEffect, useRef, useState } from 'react'
+import { useControls, button } from 'leva'
+import { Canvas } from '@react-three/fiber'
 import {
   useGLTF,
   Center,
@@ -15,6 +14,8 @@ import {
   MeshTransmissionMaterial,
   OrbitControls,
   Preload,
+  CameraControls,
+  useProgress,
 } from '@react-three/drei'
 
 const innerMaterial = new THREE.MeshStandardMaterial({
@@ -29,8 +30,45 @@ const innerMaterial = new THREE.MeshStandardMaterial({
   envMapIntensity: 2,
 })
 
-export default function App({ eventSource, isAutoCamera }) {
+function Camera() {
+  const cameraControlsRef = useRef()
+
+  const { active: isLoading } = useProgress()
+
+  const { position, zoom, smoothTime } = useControls({
+    position: [-1, 1.5, 4],
+    zoom: 0.5,
+    smoothTime: 2,
+    apply: button((get) => {
+      cameraControlsRef.current?.zoomTo(get('zoom'), true)
+      cameraControlsRef.current?.setPosition(...get('position'), true)
+    }),
+    reset: button(() => cameraControlsRef.current?.reset(true)),
+  })
+
+  useEffect(() => {
+    if (!isLoading) {
+      cameraControlsRef.current.smoothTime = smoothTime
+      cameraControlsRef.current.zoomTo(zoom, true)
+      cameraControlsRef.current.setPosition(...position, true)
+    }
+  }, [smoothTime, isLoading, position, zoom])
+
+  return (
+    <>
+      <OrbitControls minPolarAngle={0} maxPolarAngle={Math.PI / 2.2} />
+      <CameraControls ref={cameraControlsRef} />
+    </>
+  )
+}
+
+export default function App({ eventSource }) {
   const [isPerformanceSucks, degradePerfromance] = useState(false)
+
+  const { rotation, scenePosition } = useControls({
+    rotation: [0, -0.75, 0],
+    scenePosition: [0, -0.5, 0],
+  })
 
   return (
     <Canvas
@@ -38,31 +76,36 @@ export default function App({ eventSource, isAutoCamera }) {
       dpr={[1, isPerformanceSucks ? 1.5 : 2]}
       eventSource={eventSource}
       eventPrefix='client'
-      camera={{ position: [0, 20, 0], zoom: 4.5 }}>
-      <Preload all />
-      <PerformanceMonitor onDecline={() => degradePerfromance(true)} />
-      <color attach='background' args={['#f0f0f0']} />
-      <group position={[0, -0.5, 0]} rotation={[0, 4.25, 0]}>
-        <Scene />
-        <AccumulativeShadows
-          frames={120}
-          alphaTest={0.85}
-          opacity={0.8}
-          color='red'
-          scale={20}
-          position={[0, -0.005, 0]}>
-          <RandomizedLight
-            amount={8}
-            radius={6}
-            ambient={0.5}
-            intensity={1}
-            position={[-1.5, 2.5, -2.5]}
-            bias={0.001}
-          />
-        </AccumulativeShadows>
-      </group>
-      <Env isAutoCamera={isAutoCamera} isPerformanceSucks={isPerformanceSucks} />
-      <OrbitControls minPolarAngle={0} maxPolarAngle={Math.PI / 2.2} />
+      camera={{ position: [0, 100, 0], fov: 26 }}>
+      <Suspense>
+        <Preload all />
+        <Camera />
+        <Env isPerformanceSucks={isPerformanceSucks} />
+        <PerformanceMonitor onDecline={() => degradePerfromance(true)} />
+        <color attach='background' args={[]} />
+
+        <group position={scenePosition} rotation={rotation}>
+          <Suspense fallback={null}>
+            <Scene />
+            <AccumulativeShadows
+              frames={100}
+              alphaTest={0.85}
+              opacity={0.8}
+              color='red'
+              scale={20}
+              position={[0, -0.005, 0]}>
+              <RandomizedLight
+                amount={8}
+                radiuss={6}
+                ambient={0.5}
+                intensity={1}
+                position={[-1.5, 2.5, -2.5]}
+                bias={0.001}
+              />
+            </AccumulativeShadows>
+          </Suspense>
+        </group>
+      </Suspense>
     </Canvas>
   )
 }
@@ -81,10 +124,13 @@ Authors:
   CDcruz (https://sketchfab.com/cdcruz) (Ikea - Pokal Glass Cups)
     https://sketchfab.com/3d-models/ikea-pokal-glass-cups-21837e54a14346aa900e1ae719779b86
 */
-function Scene(props) {
+
+function Scene() {
   const { nodes, materials } = useGLTF('/glass-transformed.glb')
+
   return (
-    <group {...props} dispose={null}>
+    <group dispose={null}>
+      {/* Flowers */}
       <mesh
         castShadow
         rotation={[0, -0.5, 0]}
@@ -93,11 +139,28 @@ function Scene(props) {
       />
       <mesh castShadow geometry={nodes.straw_1.geometry} material={materials.straw_2} />
       <mesh castShadow geometry={nodes.straw_2.geometry} material={materials.straw_1} />
-      <mesh castShadow position={[0, -0.005, 0]} geometry={nodes.straw001_1.geometry} material={materials.straw_2} />
-      <mesh castShadow position={[0, -0.005, 0]} geometry={nodes.straw001_2.geometry} material={materials.straw_1} />
+      <mesh
+        castShadow
+        position={[0, -0.005, 0]}
+        geometry={nodes.straw001_1.geometry}
+        material={materials.straw_2}
+      />
+      <mesh
+        castShadow
+        position={[0, -0.005, 0]}
+        geometry={nodes.straw001_2.geometry}
+        material={materials.straw_1}
+      />
       <Center rotation={[0, -0.4, 0]} position={[-1, -0.01, -2]} top>
-        <mesh scale={1.2} castShadow geometry={nodes.flowers.geometry} material={materials['draifrawer_u1_v1.001']} />
+        <mesh
+          scale={1.2}
+          castShadow
+          geometry={nodes.flowers.geometry}
+          material={materials['draifrawer_u1_v1.001']}
+        />
       </Center>
+
+      {/* Fork */}
       <mesh
         castShadow
         geometry={nodes.fork.geometry}
@@ -105,6 +168,7 @@ function Scene(props) {
         material-color='#999'
       />
 
+      {/* Glass */}
       <Caustics
         backfaces
         color={[1, 0.8, 0.8]}
@@ -134,27 +198,28 @@ function Scene(props) {
   )
 }
 
-function Env({ isPerformanceSucks, isAutoCamera }) {
+function Env({ isPerformanceSucks }) {
   const ref = useRef()
 
-  // useFrame((state, delta) => {
-  //   // Animate the environment as well as the camera
-  //   if (isAutoCamera) {
-  //     easing.damp3(ref.current.rotation, [Math.PI / 2, 0, state.clock.elapsedTime / 5 + state.pointer.x], 0.2, delta)
-  //     easing.damp3(
-  //       state.camera.position,
-  //       [Math.sin(state.pointer.x / 4) * 9, 1.25 + state.pointer.y, Math.cos(state.pointer.x / 4) * 9],
-  //       0.5,
-  //       delta,
-  //     )
-  //     state.camera.lookAt(0, 0, 0)
-  //   }
-  // })
-  // Runtime environments can be too slow on some systems, better safe than sorry with PerfMon
   return (
-    <Environment frames={isPerformanceSucks ? 1 : Infinity} preset='city' resolution={256} background blur={0.8}>
-      <Lightformer intensity={4} rotation-x={Math.PI / 2} position={[0, 5, -9]} scale={[10, 10, 1]} />
-      <Lightformer intensity={4} rotation-x={Math.PI / 2} position={[0, 5, -9]} scale={[10, 10, 1]} />
+    <Environment
+      frames={isPerformanceSucks ? 1 : Infinity}
+      preset='city'
+      resolution={256}
+      background
+      blur={0.9}>
+      <Lightformer
+        intensity={4}
+        rotation-x={Math.PI / 2}
+        position={[0, 5, -9]}
+        scale={[10, 10, 1]}
+      />
+      <Lightformer
+        intensity={4}
+        rotation-x={Math.PI / 2}
+        position={[0, 5, -9]}
+        scale={[10, 10, 1]}
+      />
       <group rotation={[Math.PI / 2, 1, 0]}>
         {[2, -2, 2, -4, 2, -5, 2, -9].map((x, i) => (
           <Lightformer
@@ -165,9 +230,24 @@ function Env({ isPerformanceSucks, isAutoCamera }) {
             scale={[4, 1, 1]}
           />
         ))}
-        <Lightformer intensity={0.5} rotation-y={Math.PI / 2} position={[-5, 1, -1]} scale={[50, 2, 1]} />
-        <Lightformer intensity={0.5} rotation-y={Math.PI / 2} position={[-5, -1, -1]} scale={[50, 2, 1]} />
-        <Lightformer intensity={0.5} rotation-y={-Math.PI / 2} position={[10, 1, 0]} scale={[50, 2, 1]} />
+        <Lightformer
+          intensity={0.5}
+          rotation-y={Math.PI / 2}
+          position={[-5, 1, -1]}
+          scale={[50, 2, 1]}
+        />
+        <Lightformer
+          intensity={0.5}
+          rotation-y={Math.PI / 2}
+          position={[-5, -1, -1]}
+          scale={[50, 2, 1]}
+        />
+        <Lightformer
+          intensity={0.5}
+          rotation-y={-Math.PI / 2}
+          position={[10, 1, 0]}
+          scale={[50, 2, 1]}
+        />
       </group>
       <group ref={ref}>
         <Lightformer
