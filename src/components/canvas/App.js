@@ -1,7 +1,8 @@
 import * as THREE from 'three'
 import React, { Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useControls, button } from 'leva'
-import { Canvas } from '@react-three/fiber'
+import { easing } from 'maath'
+import { Canvas, useFrame } from '@react-three/fiber'
 import {
   useGLTF,
   Center,
@@ -45,65 +46,51 @@ function Camera() {
     reset: button(() => cameraControlsRef.current?.reset(true)),
   })
 
-  useEffect(() => {
-    if (!isLoading) {
-      setTimeout(() => {
-        cameraControlsRef.current.smoothTime = smoothTime
-        cameraControlsRef.current?.zoomTo(zoom, true)
-        cameraControlsRef.current?.setPosition(...position, true)
-      }, 2000)
-    }
-  }, [smoothTime, isLoading, position, zoom])
+  // useEffect(() => {
+  //   if (!isLoading) {
+  //     setTimeout(() => {
+  //       cameraControlsRef.current.smoothTime = smoothTime
+  //       cameraControlsRef.current?.zoomTo(zoom, true)
+  //       cameraControlsRef.current?.setPosition(...position, true)
+  //     }, 2000)
+  //   }
+  // }, [smoothTime, isLoading, position, zoom])
 
-  return (
-    <>
-      <OrbitControls minPolarAngle={0} maxPolarAngle={Math.PI / 2.2} />
-      <CameraControls ref={cameraControlsRef} />
-    </>
-  )
+  return <CameraControls ref={cameraControlsRef} />
 }
 
 export default function App({ eventSource }) {
   const [isPerformanceSucks, degradePerfromance] = useState(false)
 
-  const { rotation, scenePosition } = useControls({
-    rotation: [0, -0.75, 0],
-    scenePosition: [0, -0.5, 0],
-  })
-
   return (
-    <Canvas
-      shadows
-      dpr={[1, isPerformanceSucks ? 1.5 : 2]}
-      eventSource={eventSource}
-      eventPrefix='client'
-      camera={{ position: [0, 100, 0], fov: 26 }}>
-      <Camera />
-      <Env isPerformanceSucks={isPerformanceSucks} />
+    <>
+      {/* <Camera /> */}
+
       <PerformanceMonitor onDecline={() => degradePerfromance(true)} />
       <color attach='background' args={['#f0f0f0']} />
-      <Suspense fallback={null}>
-        <group position={scenePosition} rotation={rotation}>
-          <Scene />
-          <AccumulativeShadows
-            frames={100}
-            alphaTest={0.85}
-            opacity={0.8}
-            color='red'
-            scale={20}
-            position={[0, -0.005, 0]}>
-            <RandomizedLight
-              amount={8}
-              radiuss={6}
-              ambient={0.5}
-              intensity={1}
-              position={[-1.5, 2.5, -2.5]}
-              bias={0.001}
-            />
-          </AccumulativeShadows>
-        </group>
-      </Suspense>
-    </Canvas>
+      {/* <Suspense fallback={null}> */}
+      <group position={[0, -0.5, 0]} rotation={[0, -0.75, 0]}>
+        <Scene />
+        <AccumulativeShadows
+          frames={100}
+          alphaTest={0.85}
+          opacity={0.8}
+          color='red'
+          scale={20}
+          position={[0, -0.005, 0]}>
+          <RandomizedLight
+            amount={8}
+            radiuss={6}
+            ambient={0.5}
+            intensity={1}
+            position={[-1.5, 2.5, -2.5]}
+            bias={0.001}
+          />
+        </AccumulativeShadows>
+      </group>
+      <Env isPerformanceSucks={isPerformanceSucks} />
+      {/* </Suspense> */}
+    </>
   )
 }
 
@@ -121,13 +108,55 @@ Authors:
   CDcruz (https://sketchfab.com/cdcruz) (Ikea - Pokal Glass Cups)
     https://sketchfab.com/3d-models/ikea-pokal-glass-cups-21837e54a14346aa900e1ae719779b86
 */
-
-function Scene() {
+function Scene(props) {
   const { nodes, materials } = useGLTF('/glass-transformed.glb')
 
+  const causticsProps = useControls({
+    lightSource: [-2, 2.5, -2.5],
+    intensity: {
+      value: 0.02,
+      min: 0,
+      max: 0.1,
+      step: 0.001,
+    },
+    color: [1, 0.8, 0.8],
+    worldRadius: {
+      value: -0.3,
+      min: -1,
+      max: 1,
+    },
+    ior: {
+      value: 5,
+      min: -1,
+      max: 6,
+    },
+    backfaceIor: 1.26,
+    debug: false,
+  })
+
   return (
-    <group dispose={null}>
-      {/* Flowers */}
+    <group {...props} dispose={null}>
+      <Caustics debug backfaces frames={Infinity} {...causticsProps}>
+        <mesh castShadow receiveShadow geometry={nodes.glass.geometry}>
+          <MeshTransmissionMaterial
+            thickness={0.2}
+            chromaticAberration={0.05}
+            anisotropy={1.5}
+            clearcoat={1}
+            clearcoatRoughness={0.2}
+            envMapIntensity={3}
+          />
+        </mesh>
+
+        {/** Some hacks to get some back face reflections, otherwise the glass would look fake */}
+        <mesh
+          scale={[0.95, 1, 0.95]}
+          geometry={nodes.glass_back.geometry}
+          material={innerMaterial}
+        />
+        <mesh geometry={nodes.glass_inner.geometry} material={innerMaterial} />
+      </Caustics>
+
       <mesh
         castShadow
         rotation={[0, -0.5, 0]}
@@ -157,46 +186,30 @@ function Scene() {
         />
       </Center>
 
-      {/* Fork */}
       <mesh
         castShadow
         geometry={nodes.fork.geometry}
         material={materials.ForkAndKnivesSet001_1K}
         material-color='#999'
       />
-
-      {/* Glass */}
-      <Caustics
-        backfaces
-        color={[1, 0.8, 0.8]}
-        focus={[0, -1.2, 0]}
-        lightSource={[-2, 2.5, -2.5]}
-        frustum={1.75}
-        intensity={0.005}
-        worldRadius={0.66 / 10}
-        ior={0.6}
-        backfaceIor={1.26}>
-        <mesh castShadow receiveShadow geometry={nodes.glass.geometry}>
-          <MeshTransmissionMaterial
-            thickness={0.2}
-            chromaticAberration={0.05}
-            anisotropy={1.5}
-            clearcoat={1}
-            clearcoatRoughness={0.2}
-            envMapIntensity={3}
-          />
-        </mesh>
-      </Caustics>
-
-      {/** Some hacks to get some back face reflections, otherwise the glass would look fake */}
-      <mesh scale={[0.95, 1, 0.95]} geometry={nodes.glass_back.geometry} material={innerMaterial} />
-      <mesh geometry={nodes.glass_inner.geometry} material={innerMaterial} />
     </group>
   )
 }
 
 function Env({ isPerformanceSucks }) {
   const ref = useRef()
+
+  useFrame((state, delta) => {
+    // Animate the environment as well as the camera
+    if (!isPerformanceSucks) {
+      easing.damp3(
+        ref.current.rotation,
+        [Math.PI / 2, 0, state.clock.elapsedTime / 5 + state.pointer.x],
+        0.2,
+        delta,
+      )
+    }
+  })
 
   return (
     <Environment

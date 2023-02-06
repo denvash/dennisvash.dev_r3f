@@ -2,7 +2,7 @@
   "name": "react-three-next",
   "version": "2.0.0",
   "authors": [
-    "Renaud ROHLINGER <https://twitter.com/onirenaud>"
+    "Dennis Vash"
   ],
   "license": "MIT",
   "private": true,
@@ -20,7 +20,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "@react-three/drei": "^9.56.5",
+    "@react-three/drei": "^9.52.2",
     "@react-three/fiber": "^8.10.1",
     "@react-three/postprocessing": "2.7.0",
     "@types/three": "0.148.0",

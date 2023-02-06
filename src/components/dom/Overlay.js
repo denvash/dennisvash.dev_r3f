@@ -3,8 +3,8 @@ import { Loader } from '@react-three/drei'
 export function Overlay() {
   return (
     <>
-      <Loader />
-      <div className='char' style={{ top: 40, left: 40 }}>
+      {/* <Loader /> */}
+      {/* <div className='char' style={{ top: 40, left: 40 }}>
         爱
       </div>
       <div className='char' style={{ top: 40, left: '20vw' }}>
@@ -18,7 +18,7 @@ export function Overlay() {
       </div>
       <div className='char' style={{ bottom: 40, left: '40vw' }}>
         E
-      </div>
+      </div> */}
       <div
         style={{ position: 'absolute', top: 40, right: 160, fontSize: '15px', textAlign: 'right' }}>
         DENNIS
