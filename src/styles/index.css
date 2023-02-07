@@ -36,5 +36,5 @@ body {
 
 canvas {
   opacity: 0;
-  animation: fade-in 5s ease 1s forwards;
+  animation: fade-in 4s ease 5s forwards;
 }

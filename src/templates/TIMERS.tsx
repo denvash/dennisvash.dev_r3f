@@ -1,0 +1,5 @@
+export const TIMERS_SEC = {
+  SCENE_START: 8,
+  TITLE_START: 10,
+  SUBTITLE_START: 11,
+}

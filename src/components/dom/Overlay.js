@@ -1,11 +1,9 @@
-import { Loader } from '@react-three/drei'
+import { TIMERS_SEC } from '@/templates/TIMERS'
 import { motion } from 'framer-motion'
 
 export function Overlay() {
   return (
     <>
-      <Loader />
-
       <div className='absolute text-lg font-medium text-right top-10 right-10 '>
         <div className='flex flex-row gap-8'>
           <motion.div
@@ -39,7 +37,7 @@ export function Overlay() {
             className='block font-extrabold leading-none text-[16rem] drop-shadow-md'
             initial={{ visibility: 'hidden' }}
             animate={{ visibility: 'visible' }}
-            transition={{ delay: 2 }}>
+            transition={{ delay: TIMERS_SEC.TITLE_START }}>
             爱
           </motion.div>
 
@@ -47,7 +45,7 @@ export function Overlay() {
             className='block text-sm text-center font-extralight'
             initial={{ visibility: 'hidden' }}
             animate={{ visibility: 'visible' }}
-            transition={{ delay: 4 }}>
+            transition={{ delay: TIMERS_SEC.SUBTITLE_START }}>
             LOVE
           </motion.div>
         </div>

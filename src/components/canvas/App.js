@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import React, { Suspense, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useControls, button } from 'leva'
 import { easing } from 'maath'
 import { useFrame } from '@react-three/fiber'
@@ -18,6 +18,7 @@ import {
   OrbitControls,
 } from '@react-three/drei'
 import { COLORS } from '@/styles/COLORS'
+import { TIMERS_SEC } from '@/templates/TIMERS'
 
 const innerMaterial = new THREE.MeshStandardMaterial({
   transparent: true,
@@ -37,10 +38,9 @@ function Camera() {
   const { active: isLoading } = useProgress()
   const [isInTrasition, setIsInTrasition] = useState(true)
 
-  const { position, zoom, smoothTime, isCameraControlEnabled } = useControls({
+  const { position, zoom, isCameraControlEnabled } = useControls({
     position: [-1, 1.5, 4],
     zoom: 0.5,
-    smoothTime: 2,
     apply: button((get) => {
       cameraControlsRef.current?.zoomTo(get('zoom'), true)
       cameraControlsRef.current?.setPosition(...get('position'), true)
@@ -53,17 +53,17 @@ function Camera() {
   })
 
   useEffect(() => {
-    cameraControlsRef.current.addEventListener('rest', () => {
-      setIsInTrasition(false)
-    })
     if (!isLoading) {
+      cameraControlsRef.current.addEventListener('rest', () => {
+        setIsInTrasition(false)
+      })
+      cameraControlsRef.current.smoothTime = 2
       setTimeout(() => {
-        cameraControlsRef.current.smoothTime = smoothTime
         cameraControlsRef.current?.zoomTo(zoom, true)
         cameraControlsRef.current?.setPosition(...position, true)
-      }, 2000)
+      }, TIMERS_SEC.SCENE_START * 1000)
     }
-  }, [smoothTime, isLoading, position, zoom])
+  }, [isLoading, position, zoom])
 
   return (
     <>
@@ -81,28 +81,26 @@ export default function App() {
       <Camera />
       <PerformanceMonitor onDecline={() => degradePerfromance(true)} />
       <color attach='background' args={[COLORS.primaryBg]} />
-      <Suspense fallback={null}>
-        <group position={[0, -0.1, 0]} rotation={[0, -0.75, 0]}>
-          <Scene />
-          <AccumulativeShadows
-            frames={100}
-            alphaTest={0.85}
-            opacity={0.8}
-            color='red'
-            scale={20}
-            position={[0, -0.005, 0]}>
-            <RandomizedLight
-              amount={8}
-              radiuss={6}
-              ambient={0.5}
-              intensity={1}
-              position={[-1.5, 2.5, -2.5]}
-              bias={0.001}
-            />
-          </AccumulativeShadows>
-        </group>
-        <Env isPerformanceSucks={isPerformanceSucks} />
-      </Suspense>
+      <group position={[0, -0.1, 0]} rotation={[0, -0.75, 0]}>
+        <Scene />
+        <AccumulativeShadows
+          frames={100}
+          alphaTest={0.85}
+          opacity={0.8}
+          color='red'
+          scale={20}
+          position={[0, -0.005, 0]}>
+          <RandomizedLight
+            amount={8}
+            radiuss={6}
+            ambient={0.5}
+            intensity={1}
+            position={[-1.5, 2.5, -2.5]}
+            bias={0.001}
+          />
+        </AccumulativeShadows>
+      </group>
+      <Env isPerformanceSucks={isPerformanceSucks} />
     </>
   )
 }
