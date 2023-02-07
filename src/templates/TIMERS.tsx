@@ -1,5 +1,6 @@
 export const TIMERS_SEC = {
-  SCENE_START: 8,
+  // fade in animation delay: 5s
+  SCENE_START: 6,
   TITLE_START: 10,
   SUBTITLE_START: 11,
 }
