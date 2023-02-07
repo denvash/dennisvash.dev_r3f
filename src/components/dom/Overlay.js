@@ -1,11 +1,7 @@
-import { COLORS } from '@/styles/COLORS'
 import { TIMERS_SEC } from '@/templates/TIMERS'
 import { motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
 
 export function Overlay() {
-  const [isResumeHovered, setIsResumeHovered] = useState(false)
-
   return (
     <>
       <div className='absolute text-lg font-medium text-right top-10 right-10 '>
