@@ -81,7 +81,7 @@ export default function App() {
       <Camera />
       <PerformanceMonitor onDecline={() => degradePerfromance(true)} />
       <color attach='background' args={[COLORS.primaryBg]} />
-      <group position={[0, -0.1, 0]} rotation={[0, -0.75, 0]}>
+      <group position={[0, -0.3, 0]} rotation={[0, -0.75, 0]}>
         <Scene />
         <AccumulativeShadows
           frames={100}

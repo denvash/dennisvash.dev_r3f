@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 export function Overlay() {
   return (
     <>
-      <div className='absolute text-lg font-medium text-right top-10 right-10 '>
+      <div className='absolute font-medium text-right lg:text-lg text-normal top-4 right-4'>
         <div className='flex flex-row gap-8'>
           <div className='flex flex-col'>
             <span className='block'>DENNIS</span>
@@ -25,7 +25,7 @@ export function Overlay() {
         </div>
       </div>
 
-      <div className='absolute antialiased lg:bottom-20 lg:left-20 bottom-10 left-10'>
+      <div className='absolute antialiased  bottom-20 left-10'>
         <div className='flex flex-col'>
           <motion.div
             className='block font-extrabold leading-none lg:text-[16rem] text-[10rem] drop-shadow-md'
