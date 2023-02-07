@@ -1,7 +1,11 @@
+import { COLORS } from '@/styles/COLORS'
 import { TIMERS_SEC } from '@/templates/TIMERS'
 import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
 
 export function Overlay() {
+  const [isResumeHovered, setIsResumeHovered] = useState(false)
+
   return (
     <>
       <div className='absolute text-lg font-medium text-right top-10 right-10 '>
@@ -12,12 +16,14 @@ export function Overlay() {
           </div>
 
           <div className='flex flex-col'>
-            <a
+            <motion.div
+              initial={{ opacity: 1 }}
+              whileHover={{ opacity: 0.5 }}
               className='underline underline-offset-4 decoration-2'
               href='/Dennis_Vash_Resume.pdf'
               target='_blank'>
               RESUME
-            </a>
+            </motion.div>
             <span className='ordinal tabular-nums slashed-zero'>10/02/23</span>
           </div>
         </div>
@@ -37,7 +43,7 @@ export function Overlay() {
             className='block text-sm text-center font-extralight'
             initial={{ visibility: 'hidden' }}
             animate={{ visibility: 'visible' }}
-            transition={{ delay: TIMERS_SEC.SUBTITLE_START }}>
+            transition={{ delay: TIMERS_SEC.TITLE_START + 1 }}>
             LOVE
           </motion.div>
         </div>
