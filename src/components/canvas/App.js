@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { Suspense, useEffect, useRef, useState } from 'react'
 import { useControls, button } from 'leva'
 import { easing } from 'maath'
 import { useFrame } from '@react-three/fiber'
@@ -82,23 +82,25 @@ export default function App() {
       <PerformanceMonitor onDecline={() => degradePerfromance(true)} />
       <color attach='background' args={[COLORS.primaryBg]} />
       <group position={[0, -0.3, 0]} rotation={[0, -0.75, 0]}>
-        <Scene />
-        <AccumulativeShadows
-          frames={100}
-          alphaTest={0.85}
-          opacity={0.8}
-          color='red'
-          scale={20}
-          position={[0, -0.005, 0]}>
-          <RandomizedLight
-            amount={8}
-            radiuss={6}
-            ambient={0.5}
-            intensity={1}
-            position={[-1.5, 2.5, -2.5]}
-            bias={0.001}
-          />
-        </AccumulativeShadows>
+        <Suspense fallback={null}>
+          <Scene />
+          <AccumulativeShadows
+            frames={100}
+            alphaTest={0.85}
+            opacity={0.8}
+            color='red'
+            scale={20}
+            position={[0, -0.005, 0]}>
+            <RandomizedLight
+              amount={8}
+              radiuss={6}
+              ambient={0.5}
+              intensity={1}
+              position={[-1.5, 2.5, -2.5]}
+              bias={0.001}
+            />
+          </AccumulativeShadows>
+        </Suspense>
       </group>
       <Env isPerformanceSucks={isPerformanceSucks} />
     </>

@@ -25,7 +25,7 @@ export default function App({ Component, pageProps = { title: 'index' } }) {
       <Layout ref={ref}>
         {Component?.canvas && isCanvasMounted && (
           <Scene className='pointer-events-none touch-none' eventSource={ref} eventPrefix='client'>
-            {Component.canvas(pageProps)}
+            <Component.canvas {...pageProps} />
           </Scene>
         )}
 
