@@ -18,14 +18,14 @@ export function Overlay() {
           </div>
 
           <div className='flex flex-col'>
-            <motion.div
+            <motion.a
               initial={{ opacity: 1 }}
               whileHover={{ opacity: 0.5 }}
-              className='underline underline-offset-4 decoration-2'
+              className='underline underline-offset-4 decoration-2 cursor-[inherit]'
               href='/Dennis_Vash_Resume.pdf'
               target='_blank'>
               RESUME
-            </motion.div>
+            </motion.a>
             <span className='ordinal tabular-nums slashed-zero'>10/02/23</span>
           </div>
         </div>
