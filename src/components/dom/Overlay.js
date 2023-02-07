@@ -23,10 +23,10 @@ export function Overlay() {
         </div>
       </div>
 
-      <div className='absolute antialiased bottom-20 left-20'>
+      <div className='absolute antialiased lg:bottom-20 lg:left-20 bottom-10 left-10'>
         <div className='flex flex-col'>
           <motion.div
-            className='block font-extrabold leading-none text-[16rem] drop-shadow-md'
+            className='block font-extrabold leading-none lg:text-[16rem] text-[10rem] drop-shadow-md'
             initial={{ visibility: 'hidden' }}
             animate={{ visibility: 'visible' }}
             transition={{ delay: TIMERS_SEC.TITLE_START }}>
