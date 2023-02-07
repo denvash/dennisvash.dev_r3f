@@ -1,6 +1,6 @@
 {
-  "name": "R3F Next Starter",
-  "short_name": "R3F Next Starter",
+  "name": "Dennis Vash | Software Engineer",
+  "short_name": "Dennis Vash",
   "icons": [
     {
       "src": "/icons/favicon.ico",
@@ -24,6 +24,6 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#FE9F95",
+  "background_color": "#3e3e3d"
 }

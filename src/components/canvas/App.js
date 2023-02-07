@@ -1,8 +1,8 @@
 import * as THREE from 'three'
-import React, { Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import React, { Suspense, useEffect, useRef, useState } from 'react'
 import { useControls, button } from 'leva'
 import { easing } from 'maath'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { useFrame } from '@react-three/fiber'
 import {
   useGLTF,
   Center,
@@ -13,10 +13,11 @@ import {
   PerformanceMonitor,
   AccumulativeShadows,
   MeshTransmissionMaterial,
-  OrbitControls,
   CameraControls,
   useProgress,
+  OrbitControls,
 } from '@react-three/drei'
+import { COLORS } from '@/styles/COLORS'
 
 const innerMaterial = new THREE.MeshStandardMaterial({
   transparent: true,
@@ -34,8 +35,9 @@ function Camera() {
   const cameraControlsRef = useRef()
 
   const { active: isLoading } = useProgress()
+  const [isInTrasition, setIsInTrasition] = useState(true)
 
-  const { position, zoom, smoothTime } = useControls({
+  const { position, zoom, smoothTime, isCameraControlEnabled } = useControls({
     position: [-1, 1.5, 4],
     zoom: 0.5,
     smoothTime: 2,
@@ -44,52 +46,63 @@ function Camera() {
       cameraControlsRef.current?.setPosition(...get('position'), true)
     }),
     reset: button(() => cameraControlsRef.current?.reset(true)),
+    isCameraControlEnabled: {
+      value: false,
+      label: 'camera control',
+    },
   })
 
-  // useEffect(() => {
-  //   if (!isLoading) {
-  //     setTimeout(() => {
-  //       cameraControlsRef.current.smoothTime = smoothTime
-  //       cameraControlsRef.current?.zoomTo(zoom, true)
-  //       cameraControlsRef.current?.setPosition(...position, true)
-  //     }, 2000)
-  //   }
-  // }, [smoothTime, isLoading, position, zoom])
+  useEffect(() => {
+    cameraControlsRef.current.addEventListener('rest', () => {
+      setIsInTrasition(false)
+    })
+    if (!isLoading) {
+      setTimeout(() => {
+        cameraControlsRef.current.smoothTime = smoothTime
+        cameraControlsRef.current?.zoomTo(zoom, true)
+        cameraControlsRef.current?.setPosition(...position, true)
+      }, 2000)
+    }
+  }, [smoothTime, isLoading, position, zoom])
 
-  return <CameraControls ref={cameraControlsRef} />
+  return (
+    <>
+      <OrbitControls enabled={!isInTrasition} minPolarAngle={0} maxPolarAngle={Math.PI / 2.2} />
+      <CameraControls ref={cameraControlsRef} enabled={isCameraControlEnabled || isInTrasition} />
+    </>
+  )
 }
 
-export default function App({ eventSource }) {
+export default function App() {
   const [isPerformanceSucks, degradePerfromance] = useState(false)
 
   return (
     <>
-      {/* <Camera /> */}
-
+      <Camera />
       <PerformanceMonitor onDecline={() => degradePerfromance(true)} />
-      <color attach='background' args={['#f0f0f0']} />
-      {/* <Suspense fallback={null}> */}
-      <group position={[0, -0.5, 0]} rotation={[0, -0.75, 0]}>
-        <Scene />
-        <AccumulativeShadows
-          frames={100}
-          alphaTest={0.85}
-          opacity={0.8}
-          color='red'
-          scale={20}
-          position={[0, -0.005, 0]}>
-          <RandomizedLight
-            amount={8}
-            radiuss={6}
-            ambient={0.5}
-            intensity={1}
-            position={[-1.5, 2.5, -2.5]}
-            bias={0.001}
-          />
-        </AccumulativeShadows>
-      </group>
-      <Env isPerformanceSucks={isPerformanceSucks} />
-      {/* </Suspense> */}
+      <color attach='background' args={[COLORS.primaryBg]} />
+      <Suspense fallback={null}>
+        <group position={[0, -0.1, 0]} rotation={[0, -0.75, 0]}>
+          <Scene />
+          <AccumulativeShadows
+            frames={100}
+            alphaTest={0.85}
+            opacity={0.8}
+            color='red'
+            scale={20}
+            position={[0, -0.005, 0]}>
+            <RandomizedLight
+              amount={8}
+              radiuss={6}
+              ambient={0.5}
+              intensity={1}
+              position={[-1.5, 2.5, -2.5]}
+              bias={0.001}
+            />
+          </AccumulativeShadows>
+        </group>
+        <Env isPerformanceSucks={isPerformanceSucks} />
+      </Suspense>
     </>
   )
 }
@@ -119,9 +132,8 @@ function Scene(props) {
       max: 0.1,
       step: 0.001,
     },
-    color: [1, 0.8, 0.8],
     worldRadius: {
-      value: -0.3,
+      value: -0.4,
       min: -1,
       max: 1,
     },
@@ -130,13 +142,11 @@ function Scene(props) {
       min: -1,
       max: 6,
     },
-    backfaceIor: 1.26,
     debug: false,
   })
-
   return (
     <group {...props} dispose={null}>
-      <Caustics debug backfaces frames={Infinity} {...causticsProps}>
+      <Caustics debug backfaces color={[1, 0.8, 0.8]} {...causticsProps}>
         <mesh castShadow receiveShadow geometry={nodes.glass.geometry}>
           <MeshTransmissionMaterial
             thickness={0.2}
@@ -200,7 +210,6 @@ function Env({ isPerformanceSucks }) {
   const ref = useRef()
 
   useFrame((state, delta) => {
-    // Animate the environment as well as the camera
     if (!isPerformanceSucks) {
       easing.damp3(
         ref.current.rotation,

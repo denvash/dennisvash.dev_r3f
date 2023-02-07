@@ -1,6 +1,5 @@
 import dynamic from 'next/dynamic'
 import { Overlay } from '@/components/dom/Overlay'
-// import App from '@/components/canvas/App'
 
 // Dynamic import is used to prevent a payload when the website starts, that includes threejs, r3f etc..
 // WARNING ! errors might get obfuscated by using dynamic import.
@@ -20,5 +19,5 @@ Page.canvas = (props) => {
 }
 
 export async function getStaticProps() {
-  return { props: { title: 'Dennis Vash | Software Engineer' } }
+  return { props: { title: 'Dennis Vash' } }
 }

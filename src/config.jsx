@@ -1,9 +1,9 @@
 import Head from 'next/head'
 
-const titleDefault = 'React Three Next Starter'
-const url = 'https://react-three-next.vercel.app/'
-const description = 'The easiest and fastest way to create a 3D website using React Three Fiber and NextJS'
-const author = 'Author'
+const titleDefault = 'Dennis Vash | Software Engineer'
+const url = 'https://dennisvash.dev/'
+const description = 'Software engineer specializing in web development.'
+const author = 'Dennis Vash'
 
 export default function Header({ title = titleDefault }) {
   return (
@@ -19,13 +19,10 @@ export default function Header({ title = titleDefault }) {
       {/* Search Engine Optimization Meta Tags */}
       <title>{title}</title>
       <meta name='description' content={description} />
-      <meta
-        name='keywords'
-        content='Software Engineer,Product Manager,Project Manager,Data Scientist,Computer Scientist'
-      />
+      <meta name='keywords' content='Software Engineer,Full Stack,Web' />
       <meta name='robots' content='index,follow' />
       <meta name='distribution' content='web' />
-      {/* 
+      {/*
       Facebook Open Graph meta tags
         documentation: https://developers.facebook.com/docs/sharing/opengraph */}
       <meta name='og:title' content={title} />
@@ -50,7 +47,7 @@ export default function Header({ title = titleDefault }) {
       <meta name='theme-color' content='#000' />
       <link rel='shortcut icon' href='/icons/favicon.ico' />
 
-      {/* 
+      {/*
       Twitter Summary card
         documentation: https://dev.twitter.com/cards/getting-started
         Be sure validate your Twitter card markup on the documentation site. */}
