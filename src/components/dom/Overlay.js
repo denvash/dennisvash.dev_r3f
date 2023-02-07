@@ -1,8 +1,11 @@
+import { useSceneStore } from '@/templates/hooks/useSceneStore'
 import { TIMERS_SEC } from '@/templates/TIMERS'
 import { Loader } from '@react-three/drei'
 import { motion } from 'framer-motion'
 
 export function Overlay() {
+  const isTitleEnabled = useSceneStore((state) => state.isTitleEnabled)
+
   return (
     <>
       <Loader />
@@ -28,25 +31,26 @@ export function Overlay() {
         </div>
       </div>
 
-      <div className='absolute antialiased bottom-5 left-5 md:bottom-10 sm:left-10'>
-        <div className='flex flex-col'>
-          <motion.div
-            className='block font-extrabold leading-none lg:text-[16rem] text-[10rem] drop-shadow-md'
-            initial={{ visibility: 'hidden' }}
-            animate={{ visibility: 'visible' }}
-            transition={{ delay: TIMERS_SEC.TITLE_START }}>
-            爱
-          </motion.div>
+      {isTitleEnabled && (
+        <div className='absolute antialiased bottom-5 left-5 md:bottom-10 sm:left-10'>
+          <div className='flex flex-col'>
+            <motion.div
+              className='block font-extrabold leading-none lg:text-[16rem] text-[10rem] drop-shadow-md'
+              initial={{ visibility: 'hidden' }}
+              animate={{ visibility: 'visible' }}>
+              爱
+            </motion.div>
 
-          <motion.div
-            className='block text-sm text-center font-extralight'
-            initial={{ visibility: 'hidden' }}
-            animate={{ visibility: 'visible' }}
-            transition={{ delay: TIMERS_SEC.TITLE_START + 1 }}>
-            LOVE
-          </motion.div>
+            <motion.div
+              className='block text-sm text-center font-extralight'
+              initial={{ visibility: 'hidden' }}
+              animate={{ visibility: 'visible' }}
+              transition={{ delay: 1 }}>
+              LOVE
+            </motion.div>
+          </div>
         </div>
-      </div>
+      )}
     </>
   )
 }

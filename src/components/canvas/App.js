@@ -19,6 +19,7 @@ import {
 } from '@react-three/drei'
 import { COLORS } from '@/styles/COLORS'
 import { TIMERS_SEC } from '@/templates/TIMERS'
+import { useSceneStore } from '@/templates/hooks/useSceneStore'
 
 const innerMaterial = new THREE.MeshStandardMaterial({
   transparent: true,
@@ -35,8 +36,9 @@ const innerMaterial = new THREE.MeshStandardMaterial({
 function Camera() {
   const cameraControlsRef = useRef()
 
+  const { isTitleEnabled, enableTitle } = useSceneStore()
+
   const { active: isLoading } = useProgress()
-  const [isInTrasition, setIsInTrasition] = useState(true)
 
   const { position, zoom, isCameraControlEnabled } = useControls({
     position: [-1, 1.5, 4],
@@ -55,7 +57,7 @@ function Camera() {
   useEffect(() => {
     if (!isLoading) {
       cameraControlsRef.current.addEventListener('rest', () => {
-        setIsInTrasition(false)
+        enableTitle()
       })
       cameraControlsRef.current.smoothTime = 2
       setTimeout(() => {
@@ -63,12 +65,12 @@ function Camera() {
         cameraControlsRef.current?.setPosition(...position, true)
       }, TIMERS_SEC.SCENE_START * 1000)
     }
-  }, [isLoading, position, zoom])
+  }, [position, zoom, enableTitle, isLoading])
 
   return (
     <>
-      <OrbitControls enabled={!isInTrasition} minPolarAngle={0} maxPolarAngle={Math.PI / 2.2} />
-      <CameraControls ref={cameraControlsRef} enabled={isCameraControlEnabled || isInTrasition} />
+      <OrbitControls enabled={isTitleEnabled} minPolarAngle={0} maxPolarAngle={Math.PI / 2.2} />
+      <CameraControls ref={cameraControlsRef} enabled={isCameraControlEnabled || !isTitleEnabled} />
     </>
   )
 }
