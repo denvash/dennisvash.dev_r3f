@@ -25,7 +25,7 @@ export function Overlay() {
         </div>
       </div>
 
-      <div className='absolute antialiased  bottom-20 left-10'>
+      <div className='absolute antialiased bottom-5 left-5 md:bottom-10 sm:left-10'>
         <div className='flex flex-col'>
           <motion.div
             className='block font-extrabold leading-none lg:text-[16rem] text-[10rem] drop-shadow-md'
