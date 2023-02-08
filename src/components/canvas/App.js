@@ -36,7 +36,7 @@ const innerMaterial = new THREE.MeshStandardMaterial({
 function Camera() {
   const cameraControlsRef = useRef()
 
-  const { isTitleEnabled, enableTitle } = useSceneStore()
+  const { isTitleEnabled, enableTitle, isSceneEnabled, enableScene } = useSceneStore()
 
   const { active: isLoading } = useProgress()
 
@@ -56,6 +56,12 @@ function Camera() {
 
   useEffect(() => {
     if (!isLoading) {
+      enableScene()
+    }
+  }, [isLoading, enableScene])
+
+  useEffect(() => {
+    if (isSceneEnabled) {
       cameraControlsRef.current.addEventListener('rest', () => {
         enableTitle()
       })
@@ -65,7 +71,7 @@ function Camera() {
         cameraControlsRef.current?.setPosition(...position, true)
       }, TIMERS_SEC.SCENE_START * 1000)
     }
-  }, [position, zoom, enableTitle, isLoading])
+  }, [position, zoom, enableTitle, isSceneEnabled])
 
   return (
     <>

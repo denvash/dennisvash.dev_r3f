@@ -4,9 +4,12 @@ import Layout from '@/components/dom/Layout'
 import '@/styles/index.css'
 import { Leva, useControls } from 'leva'
 import Scene from '@/components/canvas/Scene'
+import { useSceneStore } from '@/templates/hooks/useSceneStore'
 
 export default function App({ Component, pageProps = { title: 'index' } }) {
   const ref = useRef()
+
+  const { isSceneEnabled } = useSceneStore()
 
   const { isCanvasMounted, isOverlayMounted } = useControls({
     isCanvasMounted: {
@@ -29,7 +32,7 @@ export default function App({ Component, pageProps = { title: 'index' } }) {
           </Scene>
         )}
 
-        {isOverlayMounted && <Component {...pageProps} />}
+        {isOverlayMounted && isSceneEnabled && <Component {...pageProps} />}
       </Layout>
       <Leva collapsed hidden={!isLevaEnabled} />
     </>
