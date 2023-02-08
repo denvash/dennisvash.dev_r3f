@@ -21,10 +21,10 @@ export function Overlay() {
             <motion.a
               initial={{ opacity: 1 }}
               whileHover={{ opacity: 0.5 }}
-              className='underline underline-offset-4 decoration-2 cursor-[inherit]'
+              className='underline uppercase underline-offset-4 decoration-2 cursor-[inherit]'
               href='/Dennis_Vash_Resume.pdf'
               target='_blank'>
-              RESUME
+              Résumé
             </motion.a>
             <span className='ordinal tabular-nums slashed-zero'>10/02/23</span>
           </div>
