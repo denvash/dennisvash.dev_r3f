@@ -1,5 +1,4 @@
 import { useSceneStore } from '@/templates/hooks/useSceneStore'
-import { TIMERS_SEC } from '@/templates/TIMERS'
 import { Loader } from '@react-three/drei'
 import { motion } from 'framer-motion'
 
