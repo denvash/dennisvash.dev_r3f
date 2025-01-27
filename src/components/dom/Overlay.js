@@ -7,8 +7,6 @@ export function Overlay() {
 
   return (
     <>
-      <Loader />
-
       <div className='absolute font-medium text-right lg:text-lg text-normal top-4 right-4'>
         <div className='flex flex-row gap-8'>
           <div className='flex flex-col'>

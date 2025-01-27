@@ -25,6 +25,11 @@ export default function App({ Component, pageProps = { title: 'index' } }) {
   return (
     <>
       <Header title={pageProps.title} />
+      {!isSceneEnabled && (
+        <div className='fixed top-[50%] left-[48%] animate-pulse'>
+          <div className='text-base text-white font-light'>Just a moment ...</div>
+        </div>
+      )}
       <Layout ref={ref}>
         {Component?.canvas && isCanvasMounted && (
           <Scene className='pointer-events-none touch-none' eventSource={ref} eventPrefix='client'>
