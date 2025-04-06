@@ -5,6 +5,7 @@ import '@/styles/index.css'
 import { Leva, useControls } from 'leva'
 import Scene from '@/components/canvas/Scene'
 import { useSceneStore } from '@/templates/hooks/useSceneStore'
+import LoadingScreen from '@/components/dom/LoadingScreen'
 
 export default function App({ Component, pageProps = { title: 'index' } }) {
   const ref = useRef()
@@ -25,11 +26,7 @@ export default function App({ Component, pageProps = { title: 'index' } }) {
   return (
     <>
       <Header title={pageProps.title} />
-      {!isSceneEnabled && (
-        <div className='fixed top-[50%] left-[48%] animate-pulse'>
-          <div className='text-base text-white font-light'>Just a moment ...</div>
-        </div>
-      )}
+      {!isSceneEnabled && <LoadingScreen />}
       <Layout ref={ref}>
         {Component?.canvas && isCanvasMounted && (
           <Scene className='pointer-events-none touch-none' eventSource={ref} eventPrefix='client'>
